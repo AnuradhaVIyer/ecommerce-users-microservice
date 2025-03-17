@@ -67,5 +67,5 @@ jobs:
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "Build & Tests Passed!"
           body: "The build and tests were successful."
-          to: "admin@example.com"
+          to: ${{ secrets.NOTIFICATION_EMAIL }}
           from: "GitHub Actions"
