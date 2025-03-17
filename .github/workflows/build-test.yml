@@ -41,7 +41,7 @@ jobs:
             target/*.jar
             Dockerfile
             docker-compose.yml
-            .env
+            ${{ github.workspace }}/.env
             src/main/resources/application*.properties
 
       - name: Send Success Notification (Slack)
