@@ -1,0 +1,21 @@
+<configuration>
+    <!-- JSON Encoder for Structured Logging -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+                <level>level</level>
+                <thread>thread_name</thread>
+                <logger>logger_name</logger>
+                <message>message</message>
+                <contextName>service</contextName>
+                <mdc>traceId</mdc> <!-- ✅ Include traceId here -->
+            </fieldNames>
+
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="JSON_CONSOLE" />
+    </root>
+</configuration>

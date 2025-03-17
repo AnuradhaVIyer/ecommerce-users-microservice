@@ -1,0 +1,48 @@
+name: Deploy to AWS
+
+on:
+  workflow_run:
+    workflows: ["Docker Build & Push"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: spring-boot-build
+          path: artifacts/
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service --cluster ecommerce-cluster --service ecommerce-service --force-new-deployment
+
+      - name: Send Deployment Success Notification (Slack)
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "🚀 Deployment Successful on AWS!"
+
+      - name: Send Email Notification
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Deployment Successful!"
+          body: "The application has been successfully deployed to AWS."
+          to: "admin@example.com"
+          from: "GitHub Actions"
+
+      - name: Rollback on Failure
+        if: failure()
+        run: |
+          aws ecs update-service --cluster ecommerce-cluster --service ecommerce-service --force-new-deployment --task-definition previous-task-definition

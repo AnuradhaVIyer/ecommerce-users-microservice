@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  user-service:
+    build: .
+    deploy:
+      replicas: 2  # Run 2 instances
+    ports:
+      - "0:8080"  # Assign a random port dynamically
+    depends_on:
+      - mysql-db
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_PROFILES_ACTIVE: prod
+    env_file:
+      - .env
+
+  mysql-db:
+    image: mysql:8
+    container_name: mysql-container
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
