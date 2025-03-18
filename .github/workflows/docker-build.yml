@@ -1,12 +1,12 @@
 name: Docker Build & Push
 
-on:
-  workflow_run:
-    workflows: ["Build & Test"]
-    types:
-      - completed
 #on:
-  #workflow_dispatch:  # Allows manual execution from GitHub UI	
+  #workflow_run:
+    #workflows: ["Build & Test"]
+    #types:
+      #- completed
+on:
+  workflow_dispatch:  # Allows manual execution from GitHub UI	
   
 jobs:
   docker-build:
@@ -14,18 +14,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      # use || true to prevent job failure if empty    
-      - name: List Artifact Contents
-        run: ls -l artifacts/ || true 
-        
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
           name: users-microservice
           path: artifacts/
-          run-id: ${{ github.event.workflow_run.id }} #dynamically gets the run id.
-      
+         
+      # use || true to prevent job failure if empty    
+      - name: List Artifact Contents
+        run: ls -l artifacts/ || true
       
         
           
