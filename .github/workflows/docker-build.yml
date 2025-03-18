@@ -17,7 +17,7 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: users-microservice
+          name: users-microservice.zip
           path: artifacts/
          
       # use || true to prevent job failure if empty    
