@@ -18,7 +18,7 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ecommerce-users-microservice
+          name: users-microservice
           path: artifacts/
 
       - name: Log in to AWS ECR
@@ -27,9 +27,9 @@ jobs:
 
       - name: Build & Push Docker Image
         run: |
-          docker build -t ecommerce-ms-users artifacts/
-          docker tag ecommerce-ms-users:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ecommerce-ms-users:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ecommerce-ms-users:latest
+          docker build -t users-microservice artifacts/
+          docker tag users-microservice:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/users-microservice:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/users-microservice:latest
 
       - name: Send Success Notification (Slack)
         uses: rtCamp/action-slack-notify@v2
