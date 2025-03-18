@@ -1,12 +1,12 @@
 name: Deploy to AWS EC2
 
-#on:
-#  workflow_run:
-#    workflows: ["Docker Build & Push"]
-#    types:
-#      - completed
 on:
-  workflow_dispatch:  # Allows manual execution from GitHub UI	
+  workflow_run:
+    workflows: ["Docker Build & Push"]
+    types:
+      - completed
+#on:
+  #workflow_dispatch:  # Allows manual execution from GitHub UI	
   
 jobs:
   deploy:
