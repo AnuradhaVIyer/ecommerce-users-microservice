@@ -3,13 +3,15 @@ name: Using GitHub Secrets
 on:
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
-
 jobs:
-    check-env-file:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
-            - name: Test printing your secret (Remove this step in production)
-              run: |
-                  cat .env
+  check-env-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload .env file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          include-hidden-files: true
+          path: |
+            .env
+
