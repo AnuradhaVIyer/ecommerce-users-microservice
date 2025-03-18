@@ -7,13 +7,19 @@ jobs:
   check-env-file:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify .env file exists
-        run: ls -la .env
-      - name: Upload .env file as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: my-artifact
-          include-hidden-files: true
-          path: |
-            .env
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Debug - List files in working directory
+        run: ls -la
+
+      - name: Debug - Check if .env exists
+        run: |
+          if [ -f .env ]; then
+            echo ".env file is present!"
+          else
+            echo "⚠️ .env file is missing!"
+            exit 1
+          fi
+
 
