@@ -12,8 +12,8 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      #- name: Checkout repository
+        #uses: actions/checkout@v3
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
