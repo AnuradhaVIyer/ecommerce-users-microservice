@@ -21,8 +21,12 @@ jobs:
           path: artifacts/
          
       # use || true to prevent job failure if empty    
-      - name: List Artifact Contents
-        run: ls -l artifacts/ || true
+      - name: Extract Artifact
+        run: unzip artifacts/users-microservice.zip -d artifacts/
+
+      - name: List Extracted Files
+        run: ls -R artifacts/
+
       
         
           
