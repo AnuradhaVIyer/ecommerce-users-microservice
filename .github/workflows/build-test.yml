@@ -55,7 +55,9 @@ jobs:
             ${{ github.workspace }}/docker-compose.yml
             ${{ github.workspace }}/src/main/resources/application*.properties
           include-hidden-files: true
-
+      - name: List Uploaded Artifacts
+        run: ls -R ${{ github.workspace }}
+        
       - name: Send Success Notification (Slack)
         uses: rtCamp/action-slack-notify@v2
         env:
