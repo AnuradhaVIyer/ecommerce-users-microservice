@@ -14,28 +14,13 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug:List Available Artifacts
-        run: |
-          echo "Listing artifacts in this workflow run:"
-          gh run list -L 10
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Uncomment this if you need to check out the repository
-      # - name: Checkout repository
-      #   uses: actions/checkout@v3
-
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
           name: users-microservice
           path: artifacts/
          
-      # Use || true to prevent job failure if the artifact is missing
-      - name: Extract Artifact
-        run: unzip artifacts/users-microservice.zip -d artifacts/ || true
-
-      - name: List Extracted Files
+      - name: Verify Downloaded Files
         run: ls -R artifacts/
 
       - name: Log in to AWS ECR
