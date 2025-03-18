@@ -16,7 +16,7 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v3
         with:
-          name: spring-boot-build
+          name: ecommerce-users-microservice
           path: artifacts/
 
       - name: Log in to AWS ECR
