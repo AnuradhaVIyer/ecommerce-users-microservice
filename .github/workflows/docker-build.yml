@@ -1,11 +1,13 @@
 name: Docker Build & Push
 
+#on:
+  #workflow_run:
+    #workflows: ["Build & Test"]
+    #types:
+      #- completed
 on:
-  workflow_run:
-    workflows: ["Build & Test"]
-    types:
-      - completed
-
+  workflow_dispatch:  # Allows manual execution from GitHub UI	
+  
 jobs:
   docker-build:
     runs-on: ubuntu-latest
