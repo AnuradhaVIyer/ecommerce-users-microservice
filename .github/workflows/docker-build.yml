@@ -1,43 +1,54 @@
 name: Docker Build & Push
 
-#on:
-  #workflow_run:
-    #workflows: ["Build & Test"]
-    #types:
-      #- completed
+# Uncomment this to trigger the workflow automatically when Build & Test completes
+# on:
+#   workflow_run:
+#     workflows: ["Build & Test"]
+#     types:
+#       - completed
+
 on:
-  workflow_dispatch:  # Allows manual execution from GitHub UI	
+  workflow_dispatch:  # Allows manual execution from GitHub UI
   
 jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
-      #- name: Checkout repository
-        #uses: actions/checkout@v3
+      - name: Debug: List Available Artifacts
+        run: |
+          echo "Listing artifacts in this workflow run:"
+          gh run list -L 10
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Uncomment this if you need to check out the repository
+      # - name: Checkout repository
+      #   uses: actions/checkout@v3
+
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
           name: users-microservice
           path: artifacts/
          
-      # use || true to prevent job failure if empty    
+      # Use || true to prevent job failure if the artifact is missing
       - name: Extract Artifact
-        run: unzip artifacts/users-microservice.zip -d artifacts/
+        run: unzip artifacts/users-microservice.zip -d artifacts/ || true
 
       - name: List Extracted Files
         run: ls -R artifacts/
 
-      
-        
-          
       - name: Log in to AWS ECR
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+          docker login --username AWS --password-stdin \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
       - name: Build & Push Docker Image
         run: |
           docker build -t users-microservice artifacts/
-          docker tag users-microservice:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/users-microservice:latest
+          docker tag users-microservice:latest \
+          ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/users-microservice:latest
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/users-microservice:latest
 
       - name: Send Success Notification (Slack)
