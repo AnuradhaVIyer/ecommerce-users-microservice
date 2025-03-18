@@ -1,11 +1,13 @@
-name: Deploy to AWS
+name: Deploy to AWS EC2
 
+#on:
+#  workflow_run:
+#    workflows: ["Docker Build & Push"]
+#    types:
+#      - completed
 on:
-  workflow_run:
-    workflows: ["Docker Build & Push"]
-    types:
-      - completed
-
+  workflow_dispatch:  # Allows manual execution from GitHub UI	
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,7 +18,7 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v3
         with:
-          name: spring-boot-build
+          name: ecommerce-users-microservice
           path: artifacts/
 
       - name: Deploy to EC2
