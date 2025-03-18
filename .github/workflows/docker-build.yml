@@ -9,17 +9,26 @@ name: Docker Build & Push
 
 on:
   workflow_dispatch:  # Allows manual execution from GitHub UI
-  
+    inputs:
+      run_id:
+        description: 'The ID of the Build & Test workflow run to use'
+        required: true
 jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
-        with:
+         with:
+          workflow: Build & Test
           name: my-artifact
+          path: artifacts/
+          # Use the specified run_id when workflow is triggered manually
+          run_id: ${{ github.event.inputs.run_id || github.event.workflow_run.id }}
+          
       - name: Display structure of downloaded files
-        run: ls -R
+        run: ls -R artifacts/
+        
 
       - name: Log in to AWS ECR
         run: |
