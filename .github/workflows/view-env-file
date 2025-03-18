@@ -1,0 +1,13 @@
+name: Using GitHub Secrets
+
+on: [push]
+
+jobs:
+    check-env-file:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+            - name: Test printing your secret (Remove this step in production)
+              run: |
+                  cat .env
