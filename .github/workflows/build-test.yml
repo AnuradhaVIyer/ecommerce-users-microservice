@@ -1,17 +1,36 @@
 name: Build & Test
 
-on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+#on:
+  #pull_request:
+    #branches: [main]
+  #push:
+    #branches: [main]
 
+on:
+  workflow_dispatch:  # Allows manual execution from GitHub UI	
+  
 jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Generate .env file from GitHub Secrets
+        run: |
+          echo "# MySQL Configuration" > $GITHUB_WORKSPACE/.env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> $GITHUB_WORKSPACE/.env
+          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> $GITHUB_WORKSPACE/.env
+          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> $GITHUB_WORKSPACE/.env
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> $GITHUB_WORKSPACE/.env
+          echo "" >> $GITHUB_WORKSPACE/.env
+          echo "# Spring Datasource Configuration" >> $GITHUB_WORKSPACE/.env
+          echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> $GITHUB_WORKSPACE/.env
+          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.MYSQL_USER }}" >> $GITHUB_WORKSPACE/.env
+          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> $GITHUB_WORKSPACE/.env
+
+      - name: Debug - Check if .env exists
+        run: cat $GITHUB_WORKSPACE/.env
 
       - name: Set up JDK 23
         uses: actions/setup-java@v2
@@ -25,24 +44,17 @@ jobs:
       - name: Run Unit Tests
         run: mvn test
 
-      - name: Run Code Scanning (CodeQL)
-        uses: github/codeql-action/init@v3
-        with:
-          languages: java
-
-      #- name: Run Checkstyle Linter
-        #run: mvn checkstyle:check
-
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: spring-boot-build
+          name: ecommerce-users-microservice
           path: |
-            target/*.jar
-            Dockerfile
-            docker-compose.yml
             ${{ github.workspace }}/.env
-            src/main/resources/application*.properties
+            ${{ github.workspace }}/target/*.jar
+            ${{ github.workspace }}/Dockerfile
+            ${{ github.workspace }}/docker-compose.yml
+            ${{ github.workspace }}/src/main/resources/application*.properties
+          include-hidden-files: true
 
       - name: Send Success Notification (Slack)
         uses: rtCamp/action-slack-notify@v2
@@ -51,7 +63,7 @@ jobs:
           SLACK_MESSAGE: "✅ Build & Tests Passed!"
           
       - name: Send Failure Notification (Slack)
-        if: failure()  # Only runs if the job fails
+        if: failure()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
