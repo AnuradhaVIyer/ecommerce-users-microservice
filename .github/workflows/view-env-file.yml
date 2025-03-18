@@ -7,6 +7,8 @@ jobs:
   check-env-file:
     runs-on: ubuntu-latest
     steps:
+      - name: Verify .env file exists
+        run: ls -la .env
       - name: Upload .env file as artifact
         uses: actions/upload-artifact@v4
         with:
