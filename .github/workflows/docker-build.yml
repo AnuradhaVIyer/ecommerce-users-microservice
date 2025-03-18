@@ -14,7 +14,7 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug: List Available Artifacts
+      - name: Debug:List Available Artifacts
         run: |
           echo "Listing artifacts in this workflow run:"
           gh run list -L 10
