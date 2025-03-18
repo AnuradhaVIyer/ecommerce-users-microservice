@@ -18,9 +18,6 @@ jobs:
           path: artifacts/
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
-          
-      - name: Display structure of downloaded files
-        run: ls -R artifacts/
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
