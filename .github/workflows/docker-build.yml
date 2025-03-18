@@ -20,6 +20,7 @@ jobs:
         with:
           name: users-microservice
           path: artifacts/
+          run-id: ${{ github.event.workflow_run.id }} #dynamically gets the run id.
 
       - name: Log in to AWS ECR
         run: |
