@@ -2,7 +2,8 @@ name: Deploy to AWS EC2
 
 on:
   workflow_run:
-    workflows: ["Docker Build & Push"]
+    #workflows: ["Docker Build & Push"]
+    workflows: ["Build & Test"]
     types:
       - completed
   workflow_dispatch:  # Allows manual execution from GitHub UI	
