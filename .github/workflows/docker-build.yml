@@ -15,13 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Build Artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v4
         with:
           name: users-microservice
-          path: artifacts/
-         
-      - name: Verify Downloaded Files
-        run: ls -R artifacts/
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Log in to AWS ECR
         run: |
