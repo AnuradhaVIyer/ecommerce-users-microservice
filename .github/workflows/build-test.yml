@@ -32,17 +32,9 @@ jobs:
 
       - name: Generate .env file from GitHub Secrets
         run: |
-          echo "# MySQL Configuration" > $GITHUB_WORKSPACE/.env
-          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> $GITHUB_WORKSPACE/.env
-          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> $GITHUB_WORKSPACE/.env
-          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> $GITHUB_WORKSPACE/.env
-          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> $GITHUB_WORKSPACE/.env
-          echo "" >> $GITHUB_WORKSPACE/.env
-          echo "# Spring Datasource Configuration" >> $GITHUB_WORKSPACE/.env
-          echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> $GITHUB_WORKSPACE/.env
-          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.MYSQL_USER }}" >> $GITHUB_WORKSPACE/.env
-          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> $GITHUB_WORKSPACE/.env
-
+          echo "${{ secrets.ENV_VARS }}" > $GITHUB_WORKSPACE/.env
+          
+      # Optional: Verify file content
       - name: Debug - Check if .env exists
         run: cat $GITHUB_WORKSPACE/.env
         
