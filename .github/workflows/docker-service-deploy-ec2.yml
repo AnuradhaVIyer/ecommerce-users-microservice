@@ -1,0 +1,65 @@
+name: Docker Compose Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build & Test"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact
+          path: artifacts/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          
+      - name: Display structure of downloaded files
+        run: |
+          ls -R artifacts/
+          
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_INSTANCE_IP }} >> ~/.ssh/known_hosts
+          
+      - name: Create deployment directory on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_INSTANCE_IP }} "mkdir -p ~/app-deployment"
+          
+      - name: Transfer files to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no -r artifacts/. ec2-user@${{ secrets.EC2_INSTANCE_IP }}:~/app-deployment/
+          
+      - name: Deploy with Docker Compose
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+          cd ~/app-deployment
+          # Make sure docker and docker-compose are installed
+          # Stop any existing containers that might conflict
+          docker-compose down || true
+          # Start the new containers
+          docker-compose up -d
+          EOF
+          
+      - name: Verify Deployment
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+          cd ~/app-deployment
+          docker-compose ps
+          # Check if the main container is running
+          if docker-compose ps | grep -q "Up"; then
+            echo "Deployment successful!"
+          else
+            echo "Deployment failed!"
+            exit 1
+          fi
+          EOF
+      

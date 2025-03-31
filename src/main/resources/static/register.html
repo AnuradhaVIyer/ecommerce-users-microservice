@@ -1,0 +1,57 @@
+<!-- // register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <form id="registrationForm">
+        <label>Name: <input type="text" name="name" required></label><br>
+        <label>Email: <input type="email" name="email" required></label><br>
+        <label>Password: <input type="password" name="password" required></label><br>
+        <label>Address: <input type="text" name="address"></label><br>
+        <label>Phone: <input type="text" name="phoneNumber"></label><br>
+        <button type="submit">Register</button>
+    </form>
+    
+    <script>
+  document.getElementById("registrationForm").addEventListener("submit", async (event) => {
+    event.preventDefault(); // Prevent form from submitting traditionally
+	
+ // Collect form values using the 'name' attribute
+    const name = document.getElementsByName("name")[0].value;
+    const email = document.getElementsByName("email")[0].value;
+    const password = document.getElementsByName("password")[0].value;
+    const address = document.getElementsByName("address")[0].value;
+    const phoneNumber = document.getElementsByName("phoneNumber")[0].value;
+
+    // Create a JSON object to send to the backend
+    const formData = { name, email, password, address, phoneNumber };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData), // Convert to JSON
+      });
+
+      if (response.ok) {
+          alert("Registration successful!");
+          // Redirect to the products page
+          window.location.href = "/products/products.html";
+        } else {
+          alert("Registration failed. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred!");
+      }
+    });
+  </script>
+    
+    
+</body>
+</html>

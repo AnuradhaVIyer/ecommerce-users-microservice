@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Request Tester</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        label { display: block; margin-top: 10px; }
+        textarea { width: 100%; height: 150px; }
+        pre { background: #f4f4f4; padding: 10px; overflow: auto; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h2>API Request Tester</h2>
+
+    <label for="method">HTTP Method:</label>
+    <select id="method">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="DELETE">DELETE</option>
+    </select>
+
+    <label for="url">API URL:</label>
+    <input type="text" id="url" placeholder="http://localhost:8080/api/users" style="width: 100%;"/>
+
+    <label for="body">Request Body (for POST/PUT):</label>
+    <textarea id="body">{
+    "name": "Anna K",
+    "username": "anna",
+    "password": "password123",
+    "email": "anna@example.com"
+}</textarea>
+
+    <button onclick="sendRequest()">Send Request</button>
+
+    <h3>Response:</h3>
+    <pre id="response"></pre>
+
+    <script>
+        async function sendRequest() {
+            const method = document.getElementById('method').value;
+            const url = document.getElementById('url').value;
+            const body = document.getElementById('body').value;
+
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: (method === 'POST' || method === 'PUT') ? body : null
+            };
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                document.getElementById('response').textContent = JSON.stringify(data, null, 4);
+            } catch (error) {
+                document.getElementById('response').textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

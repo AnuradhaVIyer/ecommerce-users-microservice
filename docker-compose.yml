@@ -1,0 +1,38 @@
+services:
+  user-service:
+    build: .
+    deploy:
+      replicas: 1  # Run 2 instances
+    restart: on-failure
+    ports:
+      - "8080:8080"  # Map port 8080 to port 8080 of host
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    mem_limit: 256m  # Limit Spring Boot to 256MB
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_PROFILES_ACTIVE: prod
+    env_file:
+      - .env
+    volumes:
+      - .env:/app/.env
+
+  mysql-db:
+    image: mysql:8
+    container_name: mysql-container
+    restart: always
+    mem_limit: 256m  # Limit Spring Boot to 256MB
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+    env_file:
+      - .env
+    volumes:
+      - .env:/app/.env
+    ports:
+      - "3306:3306"

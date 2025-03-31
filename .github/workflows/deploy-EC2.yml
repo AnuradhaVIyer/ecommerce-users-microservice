@@ -1,0 +1,53 @@
+name: Deploy to AWS EC2
+
+on:
+  workflow_run:
+    #workflows: ["Docker Build & Push"]
+    workflows: ["Build & Test"]
+    types:
+      - completed
+  workflow_dispatch:  # Allows manual execution from GitHub UI	
+  
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact
+          path: artifacts/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+          docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ecommerce-ms-users:latest
+          docker stop ecommerce-container || true
+          docker rm ecommerce-container || true
+          docker run -d --name ecommerce-container -p 8080:8080 \
+            --env-file .env \
+            ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/ecommerce-ms-users:latest
+          EOF
+
+      - name: Send Deployment Success Notification (Slack)
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: "🚀 Deployment Successful on AWS!"
+
+      - name: Send Email Notification
+        if: success()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Deployment Successful!"
+          body: "The application has been successfully deployed to AWS."
+          to: "admin@example.com"
+          from: "GitHub Actions"
+
