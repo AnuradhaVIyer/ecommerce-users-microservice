@@ -1,4 +1,4 @@
-name: Docker Build & Push
+name: Docker Build & Push to AWS ECR
 
 on:
   workflow_run:

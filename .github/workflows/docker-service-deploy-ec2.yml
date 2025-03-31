@@ -1,4 +1,4 @@
-name: Docker Compose Deploy
+name: Docker Compose Deploy to AWS EC2
 
 on:
   workflow_run:
